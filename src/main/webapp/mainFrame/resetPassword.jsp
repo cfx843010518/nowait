@@ -18,17 +18,39 @@
     <link href="css/bootstrap.css" rel="stylesheet">
 
 </head>
-<script type="text/javascript">
-    function beforeSubmit(){
-        return confirm('確認修改?');
-    }
-</script>
 <style>
     .formBox {
         width: 60%;
         margin-left: 50px;
     }
 </style>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+	function submitBefore(){
+		if($('#oldPwd').val()!='' && $('#newPwd').val()!='' && $('#rePwd').val()!=''){
+			if(!($('#newPwd').val() == $('#rePwd').val())){
+				alert("新秘密与确认密码不相同");
+				return false;
+			}
+		}else{
+			alert('请填写密码');
+			return false;
+		}
+	}
+	function checkPwd(){
+		var adminName = $("#adminName").val();
+		var oldPwd = $("#oldPwd").val();
+		if(oldPwd != ''){
+			$.get("user/selectPwd?adminName="+adminName+"&pwd="+oldPwd,function(data,status){
+				 if(data=="false"){
+					 alert("原密码错误");
+					 $("#oldPwd").val("").focus();
+				 } 
+			 });
+		}
+	}
+</script>
+
 <body>
 <ol class="breadcrumb">
     管理員：
@@ -41,17 +63,18 @@
             <h2>修改密碼</h2>
         </div>
         <div class="panel-body">
-            <form class="form-horizontal" role="form" action="login.jsp"  target="_top" method="POST" onsubmit="return beforeSubmit()">
+            <form class="form-horizontal" role="form" action="user/updatePwd"  method="POST" onsubmit="return submitBefore()">
+                <input type="hidden" value="${sessionScope.name}" name="adminName" id="adminName">
                 <div class="form-group">
                     <label for="oldPwd" class="col-sm-2 control-label">原密碼</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="oldPwd" placeholder="请输入原密碼">
+                        <input type="text" class="form-control" id="oldPwd" onblur="checkPwd()" placeholder="请输入原密碼" name="oldPwd">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="newPwd" class="col-sm-2 control-label">新密碼</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="newPwd" placeholder="请输入新密碼">
+                        <input type="text" class="form-control" id="newPwd" placeholder="请输入新密碼" name="newPwd">
                     </div>
                 </div>
                 <div class="form-group">

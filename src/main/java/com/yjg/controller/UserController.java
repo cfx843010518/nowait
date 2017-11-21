@@ -1,5 +1,7 @@
 package com.yjg.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.yjg.entity.LoginDTO;
 import com.yjg.entity.User;
 import com.yjg.service.UserService;
+import com.yjg.tools.MD5Encryption;
 
 @Controller
 @RequestMapping("/user")
@@ -71,16 +74,18 @@ public class UserController {
 	//判断user是否存在
 	@RequestMapping(value="/isExist")
 	@ResponseBody
-	public String isExistUser(String userName){
+	public String isExistUser(String userName) throws Exception{
 		String ret = "false";
 		System.out.println(userName);
-		//int exist = this.userService.selectExist(userName);
-		//if(exist==1){
-			//ret = "true";
-		//}
+		int exist = this.userService.selectExist(userName);
+		System.out.println(exist);
+		if(exist==0){
+			ret = "true";
+		}
 		return ret;
 	}
 	
+	//添加user
 	@RequestMapping(value="/add")
 	public String addUser(User user) throws Exception{
 		//System.out.println("来到这里没有？");
@@ -88,6 +93,72 @@ public class UserController {
 		return "/mainFrame/userManager/success.jsp";
 	}
 	
+	//查询全部
+	@RequestMapping(value="/list")
+	public String listUser(Model model) throws Exception{
+		//System.out.println("来到这里没有？");
+		List<User> userList = this.userService.selectUserList();
+		model.addAttribute("userList",userList);
+		return "/mainFrame/userManager/user_list.jsp";
+	}
 	
+	//查询某个用户
+	@RequestMapping(value="/Detail")
+	public String detailUser(Model model,Integer id) throws Exception{
+		//System.out.println("来到这里没有？");
+		User user = this.userService.selectDetailUser(id);
+		model.addAttribute("user",user);
+		return "/mainFrame/userManager/user_detail.jsp";
+	}
+	
+	//修改某个用户
+	@RequestMapping(value="/update")
+	public String updateUser(User user) throws Exception{
+		//System.out.println("来到这里没有？");
+		//System.out.println(user.getTrueName());
+		//System.out.println(user.getPhone());
+		//System.out.println(user.getCard());
+		this.userService.updateUser(user);
+		return "/mainFrame/userManager/success.jsp";
+	}
+	
+	//删除某个用户
+	@RequestMapping(value="/delete")
+	public String updateUser(Integer id) throws Exception{
+		//System.out.println("来到这里没有？");
+		this.userService.deleteUser(id);
+		return "/mainFrame/userManager/success.jsp";
+	}
+	
+	//删除多个用户
+	@RequestMapping(value="/deleteMore")
+	public String deleteMore(String[] checkBox)throws Exception{
+		for(String id:checkBox){
+			Integer newId = Integer.parseInt(id);
+			this.userService.deleteUser(newId);
+		}
+		return "/mainFrame/userManager/success.jsp";
+	}
+	
+	//查询原密码是否正确
+	@RequestMapping(value="/selectPwd")
+	@ResponseBody
+	public String selectPwd(String adminName,String pwd)throws Exception{
+		String ret = "false";
+		pwd = MD5Encryption.encrypt(pwd);
+		int res = this.userService.selectPwd(adminName,pwd);
+		if(res==1){
+			ret = "true";
+		}
+		return ret;
+	}
+	
+	//修改自己的密码
+	@RequestMapping(value="/updatePwd")
+	public String updatePwd(String adminName,String newPwd)throws Exception{
+		newPwd = MD5Encryption.encrypt(newPwd);
+		this.userService.updatePwd(adminName,newPwd);
+		return "/mainFrame/userManager/success.jsp";
+	}
 	
 }
