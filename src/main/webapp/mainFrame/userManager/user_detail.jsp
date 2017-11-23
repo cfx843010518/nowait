@@ -16,7 +16,15 @@
 <!-- 新 Bootstrap 核心 CSS 文件 -->
 <link href="css/bootstrap.css" rel="stylesheet">
 </head>
-<script type="text/javascript" src="js/jquery.js"></script>
+<style type="text/css">
+	small{
+		color: red;	
+	}
+</style>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrapValidator.min.js"></script>
+<link href="css/bootstrapValidator.min.css" rel="stylesheet" />
 <script type="text/javascript">
 function cardBlur(){
 	var card = $("#card").val();
@@ -59,6 +67,62 @@ function mysubmit(){
 	
 }
 </script>
+<script type="text/javascript">
+$(function () {
+    $('#myform').bootstrapValidator({message: 'This value is not valid',
+       feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+        	pwd: {
+                 validators: {
+                     notEmpty: {
+                         message: '密码不能为空'
+                     },
+                     stringLength: {
+                         min: 6,
+                         max: 18,
+                         message: '密码长度必须在6到18位之间'
+                     }
+                 }
+            },
+        	trueName: {
+                message: '真实姓名验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '真实姓名不能为空'
+                    }
+                }
+            },
+            card: {
+                validators: {
+                    notEmpty: {
+                        message: '身份证不能为空'
+                    },
+                    regexp: {
+                        regexp: /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,
+                        message: '身份证格式错误'
+                    }
+                }
+            },
+            phone: {
+                validators: {
+                    notEmpty: {
+                        message: '手机号不能为空'
+                    },
+                    regexp: {
+                        regexp: /^1[34578]\d{9}$/,
+                        message: '手机号格式错误'
+                    }
+                }
+            },
+            
+        }
+    });
+});
+</script>
 <body>
 	<ol class="breadcrumb">
 		管理員：
@@ -67,6 +131,7 @@ function mysubmit(){
 		<li><a href="mainFrame/userManager/user_list.jsp">商家列表</a></li>
 		<li class="active">詳情</li>
 	</ol>
+	<form class="form-horizontal" id="myform" role="form" action="abc" target="mainFrame"  method="POST">
 	<table class="table">
 		<thead>
 			<tr>
@@ -74,13 +139,14 @@ function mysubmit(){
 				<th></th>
 			</tr>
 		</thead>
-		<form class="form-horizontal" role="form" action="user/update" target="mainFrame" onsubmit="return mysubmit()" method="POST">
+			<tbody class="form-group">
 			<input type="hidden" value="${user.id}" name="id"/>
-			<tr>
+			 <tr>
 				<th class="col-sm-3 text-center">登錄名</th>
 				<td class="col-sm-9 text-center"><input type="text" name="userName"
 					class="form-control" value="${user.userName}" id="username"
-					style="width: 220px; margin-left: 30%" readonly="readonly"></td>
+					style="width: 220px; margin-left: 30%" disabled="disabled"></td>
+				
 			</tr>
 			<tr>
 				<th class="col-sm-3 text-center">密碼</th>
@@ -97,13 +163,13 @@ function mysubmit(){
 			<tr>
 				<th class="col-sm-3 text-center">身份證號</th>
 				<td class="col-sm-9 text-center"><input type="text" name="card" id="card"
-					class="form-control" value="${user.card}" onchange="cardBlur()"
+					class="form-control" value="${user.card}"
 					style="width: 220px; margin-left: 30%"></td>
 			</tr>
 			<tr>
 				<th class="col-sm-3 text-center">手機號碼</th>
 				<td class="col-sm-9 text-center"><input type="text" name="phone" id="phone"
-					class="form-control" value="${user.phone}" onchange="phoneBlur()"
+					class="form-control" value="${user.phone}"
 					style="width: 220px; margin-left: 30%"></td>
 			</tr>
 			<tr>
@@ -112,17 +178,16 @@ function mysubmit(){
 					class="form-control" value="${user.createDate}"
 					style="width: 220px; margin-left: 30%" disabled="disabled"></td>
 			</tr>
+			<tbody>
 			<tfoot>
 				<tr>
-					<th colspan="2" class="text-center"><input type="submit"
-						class="btn btn-success" value="修改"> <a
-						class="btn btn-danger" href="user/delete?id=${user.id}" target="mainFrame"
-						onclick="return confirm('确定要删除改商家？')">刪除該商家</a> <a class="btn btn-info"
-						href="javascript:history.back(-1)" target="mainFrame">返回列表</a></th>
+					<th colspan="2" class="text-center"><button type="submit" class="btn btn-success">修改</button>
+					 <a class="btn btn-danger" href="user/delete?id=${user.id}" target="mainFrame" onclick="return confirm('确定要删除改商家？')">刪除該商家</a> 
+					 <a class="btn btn-info" href="javascript:history.back(-1)" target="mainFrame">返回列表</a></th>
 				</tr>
 			</tfoot>
-		</form>
 	</table>
+	</form>
 </body>
 
 </html>

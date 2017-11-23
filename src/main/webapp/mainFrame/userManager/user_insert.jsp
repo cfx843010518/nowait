@@ -14,64 +14,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>添加商家頁面</title>
     <!-- 新 Bootstrap 核心 CSS 文件 -->
-    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 </head>
-<script type="text/javascript" src="js/jquery.js"></script>
-<script>
-function add(){
-    if (confirm("確認添加？")) {
-    	if(!($('#username').val()!='' && $('#password').val()!='' && $('#trueName').val()!='' && $('#card').val()!='' && $('#phone').val()!='')){
-    		alert('信息不能为空');
-    		return false;
-    	}
-    }
-    else{
-    	return false;
-    }
-}
-function blurs(){
-	var username = $("#username").val();
-	 $.get("user/isExist?userName="+username,function(data,status){
-		 if(data=="false"){
-			 alert("该登录名已存在");
-			 $("#username").val("").focus();
-		 } 
-	 });
-}
-function cardBlur(){
-	var card = $("#card").val();
-	//alert(card);
-	var reg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
-	//alert(reg.test(card));
-	if(!(reg.test(card))){
-		alert("身份证不符合规范");
-		$("#card").val("");
-		//兼容火狐 IE 浏览器不能聚焦问题
-		setTimeout(function(){
-			$('#card').focus();
-		},0);
-	}
-}
-function phoneBlur(){
-	var phone = $("#phone").val();
-	//alert(card);
-	var reg = /^1[34578]\d{9}$/;
-	//alert(reg.test(card));
-	if(!reg.test(phone)){
-		alert("手机号不符合规范");
-		$("#phone").val("");
-		//兼容火狐 IE 浏览器不能聚焦问题
-		setTimeout(function(){
-			$('#phone').focus();
-		},0);
-	}
-}
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrapValidator.min.js"></script>
+<link href="css/bootstrapValidator.min.css" rel="stylesheet" />
+<script type="text/javascript">
+	$(function () {
+    $('#myform').bootstrapValidator({message: 'This value is not valid',
+       feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+        	userName: {
+                validators: {
+                    notEmpty: {
+                        message: '登录名不能为空'
+                    },
+                    callback: {
+                    	message: '登录名已存在',
+                    	callback: function (value, validator) {
+                    		var res = true;
+                    		$.ajax({
+                    			  url: 'user/isExist',
+                    			  type: 'get',
+                    			  dataType: 'script',
+                    			  data: {userName:value},
+                    			  async: false,
+                    			  success: function (data) {
+									if (data == 'true') {
+										res = false;
+									}
+                    			  }
+                    			});
+                    		return res;
+                    }
+                   }
+                }
+            },
+        	pwd: {
+                 validators: {
+                     notEmpty: {
+                         message: '密码不能为空'
+                     },
+                     stringLength: {
+                         min: 6,
+                         max: 18,
+                         message: '密码长度必须在6到18位之间'
+                     }
+                 }
+            },
+        	trueName: {
+                message: '真实姓名验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '真实姓名不能为空'
+                    }
+                }
+            },
+            card: {
+                validators: {
+                    notEmpty: {
+                        message: '身份证不能为空'
+                    },
+                    regexp: {
+                        regexp: /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,
+                        message: '身份证格式错误'
+                    }
+                }
+            },
+            phone: {
+                validators: {
+                    notEmpty: {
+                        message: '手机号不能为空'
+                    },
+                    regexp: {
+                        regexp: /^1[34578]\d{9}$/,
+                        message: '手机号格式错误'
+                    }
+                }
+            },
+            
+        }
+    });
+});
 </script>
 <style>
     .formBox {
         width: 60%;
         margin-left: 50px;
     }
+}
 </style>
 <body>
 <ol class="breadcrumb">
@@ -91,7 +127,7 @@ function phoneBlur(){
             <div class="form-group">
                 <label for="username" class="col-sm-2 control-label">登錄名</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="username" onblur="blurs()" name="userName" placeholder="請輸入登錄名">
+                    <input type="text" class="form-control" id="username" name="userName" placeholder="請輸入登錄名">
                 </div>
             </div>
             <div class="form-group">
@@ -109,18 +145,17 @@ function phoneBlur(){
             <div class="form-group">
                 <label for="card" class="col-sm-2 control-label">身份證號</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="card" name="card" onchange="cardBlur()" placeholder="請輸入身份證號">
+                    <input type="text" class="form-control" id="card" name="card"  placeholder="請輸入身份證號">
                 </div>
             </div>
             <div class="form-group">
                 <label for="phone" class="col-sm-2 control-label">手機號</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="phone" name="phone" placeholder="請輸入手機號" onchange="phoneBlur()">
+                    <input type="text" class="form-control" id="phone" name="phone" placeholder="請輸入手機號" >
                 </div>
             </div>
-
             <div class="form-group text-center">
-                <button type="submit" class="btn btn-success" onclick="return add()">添加</button>
+                <button type="submit" class="btn btn-success">添加</button>
             </div>
         </form>
         </div>

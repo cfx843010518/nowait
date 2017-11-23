@@ -79,7 +79,7 @@ public class UserController {
 		System.out.println(userName);
 		int exist = this.userService.selectExist(userName);
 		System.out.println(exist);
-		if(exist==0){
+		if(exist==1){
 			ret = "true";
 		}
 		return ret;
